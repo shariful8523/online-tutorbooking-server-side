@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 
@@ -53,6 +53,16 @@ async function run() {
             res.send(result)
         })
 
+
+        // Single language tutors route
+        app.get('/tutors/:language', async (req, res) => {
+            const language = req.params.language;
+            const query = { language: language };  
+            const tutors = await TutorCollection.find(query).toArray();  
+            res.send(tutors);
+        });
+        
+        
 
 
 
