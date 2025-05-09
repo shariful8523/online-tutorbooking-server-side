@@ -31,14 +31,14 @@ async function run() {
         const TutorCollection = database.collection("Tutors")
 
         // All tutors
-        app.get('/tutors', async (req, res) => {
+        app.get('/tutor', async (req, res) => {
             const cursor = TutorCollection.find();
             const result = await cursor.toArray();
             res.send(result)
         })
 
         // Add a tutor
-        app.post('/tutors', async (req, res) => {
+        app.post('/tutor', async (req, res) => {
             const tutors = req.body;
             const result = await TutorCollection.insertOne(tutors);
             res.send(result)
@@ -46,34 +46,52 @@ async function run() {
 
         // Get Tutors find filter by  userGmail
 
-        app.get('/tutors', async (req, res) => {
-           const {userEmail} = req.query;
-           let query = {} ;
+        app.get('/tutor', async (req, res) => {
+            const { userEmail } = req.query;
+            let query = {};
 
-           if (userEmail) {
-            query.userEmail= userEmail;
-           }
+            if (userEmail) {
+                query.userEmail = userEmail;
+            }
 
-           const cursor = TutorCollection.find(query);
-           const result = await cursor.toArray();
-           res.send(result);
+            const cursor = TutorCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
         });
 
         //  Single tutor by ID
         app.get('/tutor/:id', async (req, res) => {  // Route pattern change
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
-            const tutor = await TutorCollection.findOne(query);
-            res.send(tutor)
+            const result = await TutorCollection.findOne(query);
+            res.send(result)
         })
 
         // Tutors by language
-        app.get('/tutors/language/:language', async (req, res) => {
+        app.get('/tutor/language/:language', async (req, res) => {
             const language = req.params.language;
             const query = { language: language };
             const tutors = await TutorCollection.find(query).toArray();
             res.send(tutors);
         });
+
+        // Tutorials Delete 
+        app.delete('/tutor/:id', async (req, res) => {  
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await TutorCollection.deleteOne(query);
+            res.send(result);
+        });
+
+
+
+
+
+
+
+
+
+
 
     } finally {
         // await client.close();
