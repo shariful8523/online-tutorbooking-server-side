@@ -5,7 +5,7 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
-// middle ware 
+// middleware 
 app.use(cors({
     origin: '*',
 }));
@@ -28,24 +28,9 @@ async function run() {
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
         const database = client.db("TutorsDB");
-        const TutorCollection = database.collection("Tutors")
+        const TutorCollection = database.collection("Tutors");
 
-        // All tutors
-        app.get('/tutor', async (req, res) => {
-            const cursor = TutorCollection.find();
-            const result = await cursor.toArray();
-            res.send(result)
-        })
-
-        // Add a tutor
-        app.post('/tutor', async (req, res) => {
-            const tutors = req.body;
-            const result = await TutorCollection.insertOne(tutors);
-            res.send(result)
-        })
-
-        // Get Tutors find filter by  userGmail
-
+        // Get all tutors or filter by userEmail
         app.get('/tutor', async (req, res) => {
             const { userEmail } = req.query;
             let query = {};
@@ -59,15 +44,22 @@ async function run() {
             res.send(result);
         });
 
-        //  Single tutor by ID
-        app.get('/tutor/:id', async (req, res) => {  // Route pattern change
+        // Add a tutor
+        app.post('/tutor', async (req, res) => {
+            const tutors = req.body;
+            const result = await TutorCollection.insertOne(tutors);
+            res.send(result);
+        });
+
+        // Get single tutor by ID
+        app.get('/tutor/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await TutorCollection.findOne(query);
-            res.send(result)
-        })
+            res.send(result);
+        });
 
-        // Tutors by language
+        // Get tutors by language
         app.get('/tutor/language/:language', async (req, res) => {
             const language = req.params.language;
             const query = { language: language };
@@ -75,34 +67,53 @@ async function run() {
             res.send(tutors);
         });
 
-        // Tutorials Delete 
-        app.delete('/tutor/:id', async (req, res) => {  
+        // Update tutor by ID
+        app.put('/tutor/:id', async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await TutorCollection.deleteOne(query);
-            res.send(result);
+            const updatedData = req.body;
+
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+
+            const updatedTutors = {
+                $set: {
+                    name: updatedData.name,
+                    email: updatedData.email,
+                    language: updatedData.language,
+                    image: updatedData.image,
+                    price: updatedData.price,
+                    review: updatedData.review,
+                    description: updatedData.description
+                }
+            };
+            const result = await TutorCollection.updateOne(filter, updatedTutors, options);
+            res.send({
+                success: true,
+                modified: result.modifiedCount > 0
+            });
+
         });
 
+        // Delete tutor by ID
+        app.delete('/tutor/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await TutorCollection.deleteOne(query);
+            res.send(result);
 
-
-
-
-
-
-
-
-
+        });
 
     } finally {
+        // Ensure to close the connection (optional)
         // await client.close();
     }
 }
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('server is running')
-})
+    res.send('server is running');
+});
 
 app.listen(port, () => {
-    console.log(`server is Running at : ${port}`)
-})
+    console.log(`server is Running at : ${port}`);
+});
