@@ -30,6 +30,10 @@ async function run() {
         const database = client.db("TutorsDB");
         const TutorCollection = database.collection("Tutors");
 
+        // Book a Tutorials
+
+        const BookingCollection = database.collection("Bookings");
+
         // Get all tutors or filter by userEmail
         app.get('/tutor', async (req, res) => {
             const { userEmail } = req.query;
@@ -66,6 +70,29 @@ async function run() {
             const tutors = await TutorCollection.find(query).toArray();
             res.send(tutors);
         });
+
+        // Book a Tutorial
+
+        app.post('/booking', async (req, res) => {
+            const bookingData = req.body;
+            const result = await BookingCollection.insertOne(bookingData);
+            res.send(result);
+        })
+
+        // Get Book by user email
+
+        app.get('/booking', async (req, res) => {
+            const userEmail2 = req.query.email;
+            let query = {};
+
+            if (userEmail2) {
+                query.userEmail = userEmail2;
+            }
+
+            const result = await BookingCollection.find(query).toArray();
+            res.send(result);
+        });
+
 
         // Update tutor by ID
         app.put('/tutor/:id', async (req, res) => {
