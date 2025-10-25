@@ -93,7 +93,7 @@ async function run() {
         const BookingCollection = database.collection("Bookings");
 
         // Get all tutors or filter by userEmail
-        app.get('/tutor', verifyToken, async (req, res) => {
+        app.get('/tutor',  async (req, res) => {
             const { userEmail } = req.query;
             let query = {};
 
@@ -114,7 +114,7 @@ async function run() {
         });
 
         // Get single tutor by ID
-        app.get('/tutor/:id', verifyToken, async (req, res) => {
+        app.get('/tutor/:id',  async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await TutorCollection.findOne(query);
@@ -122,7 +122,7 @@ async function run() {
         });
 
         // Get tutors by language
-        app.get('/tutor/language/:language', verifyToken, async (req, res) => {
+        app.get('/tutor/language/:language',  async (req, res) => {
             const language = req.params.language;
             const query = { language: language };
             const tutors = await TutorCollection.find(query).toArray();
