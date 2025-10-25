@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 // middleware 
 app.use(cors({
-    origin: 'https://online-tutorbooking-server-side-5ns.vercel.app',
+    origin: true,
     credentials: true
 }));
 app.use(express.json());
